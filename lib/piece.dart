@@ -66,7 +66,6 @@ class Piece {
           -15,
         ];
         break;
-      default:
     }
   }
 
