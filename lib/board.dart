@@ -111,9 +111,10 @@ class _GameBoardState extends State<GameBoard> {
           int row = (index / rowLength).floor();
           int col = index % rowLength;
           if (currentPiece.position.contains(index)) {
-            return Pixel(color: Colors.yellow, child: index);
+            return Pixel(color: currentPiece.color, child: index);
           } else if (gameBoard[row][col] != null) {
-            return Pixel(color: Colors.pink, child: '');
+            final Tetromino? tetrominoType = gameBoard[row][col];
+            return Pixel(color: tetrominoColors[tetrominoType], child: '');
           } else {
             return Pixel(color: Colors.grey[900], child: index);
           }

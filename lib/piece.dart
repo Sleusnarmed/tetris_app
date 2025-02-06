@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'values.dart';
 
 class Piece {
@@ -7,6 +9,10 @@ class Piece {
 
   // the piece is just a list of integers
   List<int> position = [];
+
+  Color get color {
+    return tetrominoColors[type] ?? const Color(0xFFFFFFFF);
+  }
 
   void initializePiece() {
     switch (type) {
