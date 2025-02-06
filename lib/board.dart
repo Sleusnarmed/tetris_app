@@ -21,7 +21,7 @@ class GameBoard extends StatefulWidget {
 }
 
 class _GameBoardState extends State<GameBoard> {
-  Piece currentPiece = Piece(type: Tetromino.T);
+  Piece currentPiece = Piece(type: Tetromino.Z);
 
   @override
   void initState() {
@@ -33,7 +33,7 @@ class _GameBoardState extends State<GameBoard> {
   void startGame() {
     currentPiece.initializePiece();
 
-    Duration frameRate = const Duration(milliseconds: 200);
+    Duration frameRate = const Duration(milliseconds: 800);
     gameLoop(frameRate);
   }
 
@@ -98,27 +98,78 @@ class _GameBoardState extends State<GameBoard> {
     currentPiece.initializePiece();
   }
 
+  void moveLeft() {
+    if (!checkCollision(Direction.left)) {
+      setState(() {
+        currentPiece.movePiece(Direction.left);
+      });
+    }
+  }
+
+  void moveRight() {
+    if (!checkCollision(Direction.right)) {
+      setState(() {
+        currentPiece.movePiece(Direction.right);
+      });
+    }
+  }
+
+  void rotatePiece() {
+    setState(() {
+      currentPiece.rotatePiece();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: GridView.builder(
-        itemCount: rowLength * colLength,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: rowLength),
-        itemBuilder: (context, index) {
-          int row = (index / rowLength).floor();
-          int col = index % rowLength;
-          if (currentPiece.position.contains(index)) {
-            return Pixel(color: currentPiece.color, child: index);
-          } else if (gameBoard[row][col] != null) {
-            final Tetromino? tetrominoType = gameBoard[row][col];
-            return Pixel(color: tetrominoColors[tetrominoType], child: '');
-          } else {
-            return Pixel(color: Colors.grey[900], child: index);
-          }
-        },
+      body: Column(
+        children: [
+          Expanded(
+            child: GridView.builder(
+              itemCount: rowLength * colLength,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: rowLength),
+              itemBuilder: (context, index) {
+                int row = (index / rowLength).floor();
+                int col = index % rowLength;
+                if (currentPiece.position.contains(index)) {
+                  return Pixel(color: currentPiece.color, child: index);
+                } else if (gameBoard[row][col] != null) {
+                  final Tetromino? tetrominoType = gameBoard[row][col];
+                  return Pixel(
+                      color: tetrominoColors[tetrominoType], child: '');
+                } else {
+                  return Pixel(color: Colors.grey[900], child: index);
+                }
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 50.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+              IconButton(
+                onPressed: moveLeft,
+                color: Colors.white,
+                icon: Icon(Icons.arrow_back_ios),
+              ),
+              IconButton(
+                onPressed: rotatePiece,
+                color: Colors.white,
+                icon: Icon(Icons.rotate_right),
+              ),
+              IconButton(
+                onPressed: moveRight,
+                color: Colors.white,
+                icon: Icon(Icons.arrow_forward_ios),
+              ),
+            ]),
+          ),
+        ],
       ),
     );
   }
