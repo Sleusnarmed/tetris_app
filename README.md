@@ -4,18 +4,22 @@ A classic Tetris game built with Flutter. This project is a clone inspired by [M
 
 ## Screenshots
 <!-- Add screenshots of your app here if available -->
-![Screenshot 1](screenshots/screenshot1.png)
-![Screenshot 2](screenshots/screenshot2.png)
+![Screenshot 1](assets/screenshot1.png)
+![Screenshot 2](assets/screenshot2.png)
 
 ## Features
 
 - Classic Tetris gameplay.
 - Responsive and intuitive controls.
 - Score tracking and level progression.
-- Custom features added by myself:
-  - [Feature 1]: In progress.
+- 🚀 Upcoming Features (WIP) added by myself:
+  - Hard Drop: Drop a piece instantly.
+  - Hold Mechanic: Save a Tetromino for later.
+  - Background Customization: Add a custom background.
+  - Touch Controls: Swipe gestures instead of buttons.
+  - Game Menu: Implement a main menu UI.
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -31,33 +35,36 @@ A classic Tetris game built with Flutter. This project is a clone inspired by [M
 
 2. Navigate to the project directory:
 
+   ```bash
     cd tetris-app
 
 3. Install dependencies:
 
+   ```bash
     flutter pub get
 
 4. Run the app:
 
+   ```bash
    flutter run
 
-## How to Play
+## 🎮 How to Play
 
-Use the arrow keys or on-screen buttons to move the Tetrominoes.
+Use the on-screen buttons to move the Tetrominoes.
 
-Rotate the pieces using the up arrow or rotate button.
+Rotate the pieces using the rotate button.
 
 Clear lines to score points.
 
-## Acknowledgments
+## 📌 Acknowledgments
 
-This project is a clone inspired by Mitch Koko.
+This project is a clone inspired by Mitch Koko with features added by myself.
 
-## License
+## 📜 License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
 
-## Contact
+## 📬 Contact
 
 If you have any questions or feedback, feel free to reach out:
 
