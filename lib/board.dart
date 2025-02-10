@@ -164,6 +164,14 @@ class _GameBoardState extends State<GameBoard> {
     }
   }
 
+  void moveDown(){
+    if (!checkCollision(Direction.down)) {
+      setState(() {
+        currentPiece.movePiece(Direction.down);
+      });
+    }
+  }
+
   void rotatePiece() {
     setState(() {
       currentPiece.rotatePiece();
@@ -249,6 +257,11 @@ class _GameBoardState extends State<GameBoard> {
                     onPressed: moveRight,
                     color: Colors.white,
                     icon: Icon(Icons.arrow_forward_ios),
+                  ),
+                  IconButton(
+                    onPressed: moveDown,
+                    color: Colors.white,
+                    icon: Icon(Icons.arrow_drop_down),
                   ),
                 ]),
           ),
