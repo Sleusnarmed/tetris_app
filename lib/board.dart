@@ -25,6 +25,8 @@ class _GameBoardState extends State<GameBoard> {
 
   int currentScore = 0;
 
+  bool gameOver = false;
+
   @override
   void initState() {
     super.initState();
@@ -44,11 +46,53 @@ class _GameBoardState extends State<GameBoard> {
       frameRate,
       (timer) {
         setState(() {
+          clearLines();
           checkLanding();
+
+          if (gameOver == true) {
+            timer.cancel();
+            showGameOverDialog();
+          }
           currentPiece.movePiece(Direction.down);
         });
       },
     );
+  }
+
+  void showGameOverDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Game Over'),
+        content: Text('Your Score: $currentScore'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              resetGame();
+              Navigator.pop(context);
+            },
+            child: Text('Play Again'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void resetGame() {
+    gameBoard = List.generate(
+      colLength,
+      (i) => List.generate(
+        rowLength,
+        (j) => null,
+      ),
+    );
+
+    gameOver = false;
+    currentScore = 0;
+
+    createNewPiece();
+
+    startGame();
   }
 
   bool checkCollision(Direction direction) {
@@ -98,6 +142,10 @@ class _GameBoardState extends State<GameBoard> {
         Tetromino.values[rand.nextInt(Tetromino.values.length)];
     currentPiece = Piece(type: randomType);
     currentPiece.initializePiece();
+
+    if (isGameOver()) {
+      gameOver = true;
+    }
   }
 
   void moveLeft() {
@@ -142,6 +190,15 @@ class _GameBoardState extends State<GameBoard> {
     }
   }
 
+  bool isGameOver() {
+    for (int col = 0; col < rowLength; col++) {
+      if (gameBoard[0][col] != null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -158,13 +215,13 @@ class _GameBoardState extends State<GameBoard> {
                 int row = (index / rowLength).floor();
                 int col = index % rowLength;
                 if (currentPiece.position.contains(index)) {
-                  return Pixel(color: currentPiece.color, child: index);
+                  return Pixel(color: currentPiece.color);
                 } else if (gameBoard[row][col] != null) {
                   final Tetromino? tetrominoType = gameBoard[row][col];
                   return Pixel(
-                      color: tetrominoColors[tetrominoType], child: '');
+                      color: tetrominoColors[tetrominoType]);
                 } else {
-                  return Pixel(color: Colors.grey[900], child: index);
+                  return Pixel(color: Colors.grey[900]);
                 }
               },
             ),
