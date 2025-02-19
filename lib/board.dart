@@ -136,6 +136,24 @@ class _GameBoardState extends State<GameBoard> {
     }
   }
 
+  bool canMove(Piece piece, int x, int y) {
+    for (int pos in piece.position) {
+      int row = (pos / rowLength).floor();
+      int col = pos % rowLength;
+
+      row += y;
+      col += x;
+
+      if (row >= colLength ||
+          col < 0 ||
+          col >= rowLength ||
+          (row >= 0 && gameBoard[row][col] != null)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   void createNewPiece() {
     Random rand = Random();
     Tetromino randomType =
@@ -145,6 +163,16 @@ class _GameBoardState extends State<GameBoard> {
 
     if (isGameOver()) {
       gameOver = true;
+    }
+  }
+
+  void lockPiece() {
+    for (int i = 0; i < currentPiece.position.length; i++) {
+      int row = (currentPiece.position[i] / rowLength).floor();
+      int col = currentPiece.position[i] % rowLength;
+      if (row >= 0 && col >= 0) {
+        gameBoard[row][col] = currentPiece.type;
+      }
     }
   }
 
@@ -172,6 +200,16 @@ class _GameBoardState extends State<GameBoard> {
     }
   }
 
+  void hardDrop() {
+  setState(() {
+    while (canMove(currentPiece, 0, 1)) {
+      currentPiece.movePiece(Direction.down);
+    }
+    lockPiece();
+    clearLines();
+    createNewPiece();
+  });
+}
   void rotatePiece() {
     setState(() {
       currentPiece.rotatePiece();
@@ -179,45 +217,44 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void clearLines() {
-  List<int> fullRows = [];
+    List<int> fullRows = [];
 
-  for (int row = 0; row < colLength; row++) {
-    if (gameBoard[row].every((cell) => cell != null)) {
-      fullRows.add(row);
+    for (int row = 0; row < colLength; row++) {
+      if (gameBoard[row].every((cell) => cell != null)) {
+        fullRows.add(row);
+      }
+    }
+
+    if (fullRows.isNotEmpty) {
+      setState(() {
+        // Remove full rows from the game board and move remaining rows up
+        for (int row in fullRows) {
+          for (int r = row; r > 0; r--) {
+            gameBoard[r] = List.from(gameBoard[r - 1]);
+          }
+          // Add a new empty row at the top
+          gameBoard[0] = List.generate(rowLength, (index) => null);
+        }
+
+        int baseScore = 100;
+        int linesCleared = fullRows.length;
+
+        // Apply multiplier based on lines cleared
+        double multiplier = 1.0;
+        if (linesCleared == 2) {
+          multiplier = 1.10;
+        } else if (linesCleared == 3) {
+          multiplier = 1.15;
+        } else if (linesCleared == 4) {
+          multiplier = 1.5;
+        }
+
+        // This is 100 * linesClrared (can be 1-4) * multiplier if only one line, just 100 * 1 * 1
+        // Two lines 100 * 2 * 1.10
+        currentScore += (baseScore * linesCleared * multiplier).toInt();
+      });
     }
   }
-
-  if (fullRows.isNotEmpty) {
-    setState(() {
-    // Remove full rows from the game board and move remaining rows up
-      for (int row in fullRows) {
-        for (int r = row; r > 0; r--) {
-          gameBoard[r] = List.from(gameBoard[r - 1]);
-        }
-        // Add a new empty row at the top
-        gameBoard[0] = List.generate(rowLength, (index) => null);
-      }
-
-      
-      int baseScore = 100;
-      int linesCleared = fullRows.length;
-
-      // Apply multiplier based on lines cleared
-      double multiplier = 1.0;
-      if (linesCleared == 2) {
-        multiplier = 1.10; 
-      } else if (linesCleared == 3) {
-        multiplier = 1.15; 
-      } else if (linesCleared == 4) {
-        multiplier = 1.5; 
-      }
-
-      // This is 100 * linesClrared (can be 1-4) * multiplier if only one line, just 100 * 1 * 1
-      // Two lines 100 * 2 * 1.10
-      currentScore += (baseScore * linesCleared * multiplier).toInt();
-    });
-  }
-}
 
   bool isGameOver() {
     for (int col = 0; col < rowLength; col++) {
@@ -282,6 +319,10 @@ class _GameBoardState extends State<GameBoard> {
                     onPressed: moveDown,
                     color: Colors.white,
                     icon: Icon(Icons.arrow_drop_down),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => hardDrop(),
+                    child: Text("Hard Drop ⬇️"),
                   ),
                 ]),
           ),

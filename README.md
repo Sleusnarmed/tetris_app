@@ -11,9 +11,12 @@ A classic Tetris game built with Flutter. This project is a clone inspired by [M
 
 - Classic Tetris gameplay.
 - Responsive and intuitive controls.
-- Score tracking and level progression.
+- Score tracking progression.
+- Soft Drop added
+- Optimization for multiple lines
+- Score multiplier for multiple lines
+- Hard Drop added
 - 🚀 Upcoming Features (WIP) added by myself:
-  - Hard Drop: Drop a piece instantly.
   - Hold Mechanic: Save a Tetromino for later.
   - Background Customization: Add a custom background.
   - Touch Controls: Swipe gestures instead of buttons.
