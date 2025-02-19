@@ -21,7 +21,7 @@ class GameBoard extends StatefulWidget {
 }
 
 class _GameBoardState extends State<GameBoard> {
-  Piece currentPiece = Piece(type: Tetromino.Z);
+  Piece currentPiece = Piece(type: Tetromino.L);
 
   int currentScore = 0;
 
@@ -164,7 +164,7 @@ class _GameBoardState extends State<GameBoard> {
     }
   }
 
-  void moveDown(){
+  void moveDown() {
     if (!checkCollision(Direction.down)) {
       setState(() {
         currentPiece.movePiece(Direction.down);
@@ -179,24 +179,45 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void clearLines() {
-    for (int row = colLength - 1; row >= 0; row--) {
-      bool rowIsFull = true;
+  List<int> fullRows = [];
 
-      for (int col = 0; col < rowLength; col++) {
-        if (gameBoard[row][col] == null) {
-          rowIsFull = false;
-          break;
-        }
-      }
-      if (rowIsFull) {
+  for (int row = 0; row < colLength; row++) {
+    if (gameBoard[row].every((cell) => cell != null)) {
+      fullRows.add(row);
+    }
+  }
+
+  if (fullRows.isNotEmpty) {
+    setState(() {
+    // Remove full rows from the game board and move remaining rows up
+      for (int row in fullRows) {
         for (int r = row; r > 0; r--) {
           gameBoard[r] = List.from(gameBoard[r - 1]);
         }
-        gameBoard[0] = List.generate(row, (index) => null);
-        currentScore++;
+        // Add a new empty row at the top
+        gameBoard[0] = List.generate(rowLength, (index) => null);
       }
-    }
+
+      
+      int baseScore = 100;
+      int linesCleared = fullRows.length;
+
+      // Apply multiplier based on lines cleared
+      double multiplier = 1.0;
+      if (linesCleared == 2) {
+        multiplier = 1.10; 
+      } else if (linesCleared == 3) {
+        multiplier = 1.15; 
+      } else if (linesCleared == 4) {
+        multiplier = 1.5; 
+      }
+
+      // This is 100 * linesClrared (can be 1-4) * multiplier if only one line, just 100 * 1 * 1
+      // Two lines 100 * 2 * 1.10
+      currentScore += (baseScore * linesCleared * multiplier).toInt();
+    });
   }
+}
 
   bool isGameOver() {
     for (int col = 0; col < rowLength; col++) {
@@ -226,8 +247,7 @@ class _GameBoardState extends State<GameBoard> {
                   return Pixel(color: currentPiece.color);
                 } else if (gameBoard[row][col] != null) {
                   final Tetromino? tetrominoType = gameBoard[row][col];
-                  return Pixel(
-                      color: tetrominoColors[tetrominoType]);
+                  return Pixel(color: tetrominoColors[tetrominoType]);
                 } else {
                   return Pixel(color: Colors.grey[900]);
                 }
