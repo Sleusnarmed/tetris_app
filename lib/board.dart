@@ -136,6 +136,7 @@ class _GameBoardState extends State<GameBoard> {
     }
   }
 
+  // is something like checking collision, but for
   bool canMove(Piece piece, int x, int y) {
     for (int pos in piece.position) {
       int row = (pos / rowLength).floor();
@@ -166,6 +167,7 @@ class _GameBoardState extends State<GameBoard> {
     }
   }
 
+  // Once the hard drop is done the piece is locked
   void lockPiece() {
     for (int i = 0; i < currentPiece.position.length; i++) {
       int row = (currentPiece.position[i] / rowLength).floor();
@@ -176,6 +178,7 @@ class _GameBoardState extends State<GameBoard> {
     }
   }
 
+  // Movement see piece.dart for more information
   void moveLeft() {
     if (!checkCollision(Direction.left)) {
       setState(() {
@@ -201,15 +204,17 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void hardDrop() {
-  setState(() {
-    while (canMove(currentPiece, 0, 1)) {
-      currentPiece.movePiece(Direction.down);
-    }
-    lockPiece();
-    clearLines();
-    createNewPiece();
-  });
-}
+    setState(() {
+      while (canMove(currentPiece, 0, 1)) {
+         // Move the piece down by one row
+        currentPiece.movePiece(Direction.down);
+      }
+      lockPiece();
+      clearLines();
+      createNewPiece();
+    });
+  }
+
   void rotatePiece() {
     setState(() {
       currentPiece.rotatePiece();
@@ -242,15 +247,18 @@ class _GameBoardState extends State<GameBoard> {
         // Apply multiplier based on lines cleared
         double multiplier = 1.0;
         if (linesCleared == 2) {
-          multiplier = 1.10;
+          multiplier = 1.10; // 10%
         } else if (linesCleared == 3) {
-          multiplier = 1.15;
+          multiplier = 1.15; // 15%
         } else if (linesCleared == 4) {
-          multiplier = 1.5;
+          multiplier = 1.5; // 50%
         }
 
         // This is 100 * linesClrared (can be 1-4) * multiplier if only one line, just 100 * 1 * 1
-        // Two lines 100 * 2 * 1.10
+        // One line 100 * 1 * 1 = 100 
+        // Two lines 100 * 2 * 1.10 = 220
+        // Three lines 100 * 3 * 1.15 = 345
+        // Four lines 100 * 4 * 1.5 = 600
         currentScore += (baseScore * linesCleared * multiplier).toInt();
       });
     }
@@ -298,34 +306,59 @@ class _GameBoardState extends State<GameBoard> {
           Padding(
             padding: const EdgeInsets.only(bottom: 50.0),
             child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconButton(
-                    onPressed: moveLeft,
-                    color: Colors.white,
-                    icon: Icon(Icons.arrow_back_ios),
-                  ),
-                  IconButton(
-                    onPressed: rotatePiece,
-                    color: Colors.white,
-                    icon: Icon(Icons.rotate_right),
-                  ),
-                  IconButton(
-                    onPressed: moveRight,
-                    color: Colors.white,
-                    icon: Icon(Icons.arrow_forward_ios),
-                  ),
-                  IconButton(
-                    onPressed: moveDown,
-                    color: Colors.white,
-                    icon: Icon(Icons.arrow_drop_down),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => hardDrop(),
-                    child: Text("Hard Drop ⬇️"),
-                  ),
-                ]),
-          ),
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // Left side controls
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          onPressed: moveLeft,
+                          color: Colors.white,
+                          icon: Icon(Icons.arrow_left),
+                          highlightColor: Colors.amberAccent,
+                        ),
+                        IconButton(
+                          onPressed: moveRight,
+                          color: Colors.white,
+                          icon: Icon(Icons.arrow_right),
+                          highlightColor: Colors.amberAccent,
+                        ),
+                      ],
+                    ),
+                    // Move down button centered below left and right buttons
+                    IconButton(
+                      onPressed: moveDown,
+                      color: Colors.white,
+                      icon: Icon(Icons.arrow_drop_down),
+                      highlightColor: Colors.amberAccent,
+                    ),
+                  ],
+                ),
+
+                // Right side controls
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: rotatePiece,
+                      color: Colors.white,
+                      icon: Icon(Icons.rotate_right),
+                      highlightColor: Colors.amberAccent,
+                    ),
+                    IconButton(
+                      onPressed: hardDrop,
+                      icon: Icon(Icons.arrow_circle_down),
+                      color: Colors.white,
+                      highlightColor: Colors.amberAccent,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );
